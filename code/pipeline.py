@@ -36,8 +36,8 @@ COLOR: Muted 1990 Chicago palette — cool faded indigo and charcoal grays, ligh
 CHARACTER LOCKS (use face anchor reference for SONGYA's face):
 - SONGYA (15, mixed-race teenage boy): light caramel skin, slightly Asian almond eyes, short curly black hair, slightly round youthful face. Indoor: dark blue/gray sweater. Outdoor: olive-brown USAF 1969 surplus jacket over the sweater. Always old off-white sneakers.
 - TONY (17, Songya's older cousin): slightly chubby torso, short hair, faded olive factory work jacket.
-- CONNIE (early 30s aunt): heavyset Black-American, messy short hair, bright neon-coral 1980s tight party dress (when out), gold hoop earrings.
-- AUNT SUZIE (40s): heavyset Black-American, headscarf, brightly patterned house robe.
+- CONNIE (17, Songya's female cousin, Suzie's daughter, Cameroonian-descent Black-American): heavyset growing-horizontally build, messy short curly hair, bright 1980s loud-colored short tight party dress when out (neon coral / fluorescent pink), big gold hoop earrings, smudged makeup. Loud and brash, dresses provocatively, but always fully clothed for our purposes.
+- AUNT SUZIE (33-34, Cameroonian-descent single mom of 5): heavyset stocky build, headscarf, brightly patterned house robe, plain home clothes. Loud direct mouth.
 - EMILY (10, little sister): twin braids, light caramel mixed-race skin, kid clothes.
 - ET (16-ish): baseball cap pulled low, hint of flower-pattern bandana under brim.
 - SILENCER (17ish bodyguard type): tall broad-shouldered Black, silent stern face.
