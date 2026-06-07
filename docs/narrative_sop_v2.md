@@ -342,3 +342,39 @@ Tier A 整批跑完后**整章 review 一次**：
 
 跨页 anchor drift 是仅靠单页 review 找不到的，必须**整章 thumbnail 拼图看**。
 
+
+---
+
+## 11.5 Splash 例外（2026-06-07 Estelle P27 验证）
+
+§11 「每格最多 2 caption」**不适用于 splash 单页**。splash 是"整页 = 1 格"，没有"下一格"可拆分 caption。
+
+**splash 上限**：≤ 8 caption（含散落的 lyric / SFX 文字碎片）
+**间距规则**：caption 之间至少 60px 间距
+**face-avoid**：仍严格执行 §12
+
+P27 v2 标杆：4 句英文歌词碎片 + 1 中央 punchline + 1 底部金手指 caption = 6，全部落在音乐洪流空区不挡眼睛。
+
+---
+
+## 15. 英文/拉丁字符 caption → PIL，不走 mbf（2026-06-07 Estelle P27 验证）
+
+**mbf v1.1 已知 bug**：strip 所有空格 → 中文 caption 没事，**含英文歌词/品牌名的 caption 会被连成一坨**：
+- 「I'm gonna pop some tags」→「I'mgonnapopsometags」
+- 「Thrift Shop」→「ThriftShop」
+- 「Macklemore」可能被 strip 内部空格（虽然这词没空格，但 mbf 的 word-wrap 会从中间断开）
+
+**production agent SOP**：
+| caption 内容类型 | 渲染工具 |
+|---|---|
+| 纯中文 | mbf（无 strip 问题）|
+| 中文 + 英文品牌名 / 歌词词组 | **PIL（保留空格 + 保留整词不断行）** |
+| 纯英文歌词碎片 | **PIL（按 word boundary 保留空格 + word-wrap 不拆单词）** |
+
+**Production agent PIL 渲染 caption 要点**：
+1. 用 SourceHanSansSC（同 mbf 字体）保持视觉一致
+2. word-wrap 在空格处断，**不允许在英文单词内断**
+3. 测试用例：「I'm gonna pop some tags」「Thrift Shop」「Macklemore」「$20」「NCAA」必须整词显示
+
+待 mbf v1.3 修了 CJK+EN 混排 word-wrap 后再回归。已在 #manga-tool 提单。
+
