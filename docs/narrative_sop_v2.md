@@ -255,3 +255,90 @@ v2 caption 密度可达 13+ 个 / 页（v1 平均 2 个 / 页）。让 gpt-image
 
 **关键物件特写 + 同框 caption**（鬼灭手法 #2 落地）：
 当画面里有粉西装 / $20 / 麦克风 / 花头巾 等关键物件时，production agent 在该物件附近 PIL 合成一个小箭头 + 短 caption（如"这件 → 老乔常穿的颜色"）— 直接帮读者锚定。
+
+---
+
+## 10. Collision avoidance（2026-06-07 P26 撞车后锁）
+
+production agent 自分工**必须互 ack 后再 create task**。同一页 task 同时存在按 **prior commit**（谁先提议 split）让步，**不看时间戳，看谁先 ack 那条 split**。
+
+撞车自处理优先：发现重复 task 的一方主动 `task close --status closed --next-action "撞车让给 X，改接 Y"`，比等 lead 裁决快。
+
+**典型流程**：
+1. Agent A 在 #Content Production 公开提议「我接 P26 / 你接 P27」
+2. Agent B 公开 ack「OK」
+3. 双方分别 create task — 此时不会撞
+4. 没 ack 就先 create → 看到对方也 create 同页 → 后到者立即 close 自己的
+
+---
+
+## 11. Caption-per-panel cap（2026-06-07 Tony P11 反馈后锁）
+
+**每格最多 2 caption 矩形**。时空 caption（only Panel 1 顶角）只计 1 次。
+
+「3-4 caption / 页」是**整页平均**，不是单格上限。Panel 1 建立镜头容易超载 — 时空 + 介绍框 + 4 条 narration = 6 个 caption 会让画面被文字盖住 1/2 以上高度，**读者看不到画面**。
+
+**修法**：
+- 超出 2 个 caption → 拆到下一格（情绪节点格 / 中段格）
+- 介绍框 (kind=character_intro) 算入 2 caption 之一
+- 同一格内 caption 之间至少 24px 间距
+
+---
+
+## 12. Face-avoid placement（2026-06-07 Tony P11 反馈后锁）
+
+caption 矩形**严禁与主要人脸 bbox 重叠**（chin / mouth / eyes 三角区）。
+
+**工艺**：
+1. AI 出图后，production agent **先跑 face detect**（mediapipe / opencv face_cascade / 自带 face landmark 任选）
+2. 计算每张脸的 bbox + 给 chin/mouth/eyes 三角区扩 12px 安全边
+3. caption 候选位置（格四角 + 格中空区）跟所有 face 安全区做 collision check
+4. 全部 conflict → caption **拉到格外部下/上边界**（漫画底部"窄长条 caption"是合法 layout）
+
+**合法 caption 位置优先级**：
+1. 格顶角（左 / 右）
+2. 格底角（左 / 右）
+3. 格底外边界（画面下方延伸窄长条）
+4. 格中空区（hanger / 墙壁 / 天空 等大块空白）
+
+**严禁位置**：
+- 主角脸部任何区域
+- 主角说话时的嘴部
+- 任意角色眼睛
+- 任意角色手部（尤其是动作中的）
+
+---
+
+## 13. Per-panel anchor（2026-06-07 Tony P17 反馈后锁）
+
+**每格含命名角色（Tony / 消音器 / 主角 / Connie / Emily / 老乔 / AK / Lance 等）必须 per-panel 引用该角色 anchor URL**。同页出现 3 次 Tony → kamay reference_images 列 3 次 tony_anchor.png（即使是 SAME URL）。
+
+**prompt 文字加 per-panel face-fix 描述**：
+```
+Panel X: <character>'s face MUST match anchor reference exactly — 
+same hair, same jaw, same eye spacing, same skin tone.
+```
+
+**high-drift 场合（必查）**：
+- 同人物在 1 页内出现 ≥3 次
+- 角色脸侧向 / 仰角 / 俯角 / 阴影 / 特写
+- 角色情绪剧变（哭脸 / 怒脸 / 笑脸 vs 平静脸）
+- 车内 / 暗光 / 特殊光源场合
+
+**修法**（drift 发现后）：
+- 局部 re-gen drift 的 panel（不重整页）
+- prompt 里加更强约束："Tony in this panel is THE SAME Tony as in P11/P14 — short black wavy hair, square jaw, expressive thick eyebrows, age 18 — NOT a different actor"
+- 合成回主图重新渲染 caption
+
+---
+
+## 14. Polish 优先级（v2 wave 完工后）
+
+Tier A 整批跑完后**整章 review 一次**：
+1. 单页 70% 试读（盖文字）
+2. 单页正常读
+3. **跨页连贯**（Tony 脸跨 P11 / P14 / P17 / P22 / P26 一致吗？）
+4. **caption 节奏**（不是单页 caption 数对，是**整章 caption 节奏**对吗？过密的页 / 过疏的页找出来）
+
+跨页 anchor drift 是仅靠单页 review 找不到的，必须**整章 thumbnail 拼图看**。
+
